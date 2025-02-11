@@ -8,7 +8,6 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
-                "${workspaceFolder}/src/preprocessing.cpp",
                 "-o",
                 "${workspaceFolder}/executables/${fileBasenameNoExtension}",
                 "-I",
