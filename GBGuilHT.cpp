@@ -34,29 +34,29 @@ int main() {
     ballard->setTemplate(templ);
 
     // Create guil and set options.
-    // Ptr<GeneralizedHoughGuil> guil = createGeneralizedHoughGuil();
-    // guil->setMinDist(10);
-    // guil->setLevels(360);
-    // guil->setDp(3);
-    // guil->setMaxBufferSize(1000);
-    // guil->setMinAngle(0);
-    // guil->setMaxAngle(360);
-    // guil->setAngleStep(1);
-    // guil->setAngleThresh(1500);
-    // guil->setMinScale(0.5);
-    // guil->setMaxScale(2.0);
-    // guil->setScaleStep(0.05);
-    // guil->setScaleThresh(50);
-    // guil->setPosThresh(10);
-    // guil->setCannyLowThresh(30);
-    // guil->setCannyHighThresh(110);
-    // guil->setTemplate(templ);
+    Ptr<GeneralizedHoughGuil> guil = createGeneralizedHoughGuil();
+    guil->setMinDist(10); // Minimum distance between detected objects in pixels
+    guil->setLevels(360); // Set the number of rotation levels; 360 is maximal value.
+    guil->setDp(3); // Resolution of the accumulator used to detect centers of the objects
+    guil->setMaxBufferSize(1000); // Maximal size of inner buffers
+    guil->setMinAngle(0); // Minimal angle for the template in degrees
+    guil->setMaxAngle(360); // Maximal angle for the template in degrees
+    guil->setAngleStep(1); // Angle step in degrees
+    guil->setAngleThresh(1500); // Angle threshold in degrees
+    guil->setMinScale(0.5); // Minimal scale of the template
+    guil->setMaxScale(2.0); // Maximal scale of the template
+    guil->setScaleStep(0.05); // Scale step
+    guil->setScaleThresh(50); // Scale threshold
+    guil->setPosThresh(10); // Position threshold
+    guil->setCannyLowThresh(30); // The first threshold for the hysteresis procedure in Canny edge detector
+    guil->setCannyHighThresh(110); // The second threshold for the hysteresis procedure in Canny edge detector
+    guil->setTemplate(templ);
 
     // Execute Ballard detection.
-    // ballard->detect(grayImage, positionBallard);
+    ballard->detect(grayImage, positionBallard);
 
     // Execute Guil detection.
-    // guil->detect(grayImage, positionGuil);
+    guil->detect(grayImage, positionGuil);
 
     //  draw Ballard.
     // for (vector<Vec4f>::iterator iter = positionBallard.begin(); iter != positionBallard.end(); ++iter) {
