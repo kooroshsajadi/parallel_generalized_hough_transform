@@ -53,30 +53,34 @@ int main() {
     guil->setTemplate(templ);
 
     // Execute Ballard detection.
+    cout << "Executing Ballard detection..." << endl;
     ballard->detect(grayImage, positionBallard);
+    cout << "Ballard detection completed. Found " << positionBallard.size() << " objects." << endl;
 
     // Execute Guil detection.
+    cout << "Executing Guil detection..." << endl;
     guil->detect(grayImage, positionGuil);
+    cout << "Guil detection completed. Found " << positionGuil.size() << " objects." << endl;
 
     //  draw Ballard.
-    // for (vector<Vec4f>::iterator iter = positionBallard.begin(); iter != positionBallard.end(); ++iter) {
-    //     RotatedRect rRect = RotatedRect(Point2f((*iter)[0], (*iter)[1]), Size2f(w * (*iter)[2], h * (*iter)[2]), (*iter)[3]);
-    //     Point2f vertices[4];
-    //     rRect.points(vertices);
-    //     for (int i = 0; i < 4; i++)
-    //         line(image, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 6);
-    // }
+    for (vector<Vec4f>::iterator iter = positionBallard.begin(); iter != positionBallard.end(); ++iter) {
+        RotatedRect rRect = RotatedRect(Point2f((*iter)[0], (*iter)[1]), Size2f(w * (*iter)[2], h * (*iter)[2]), (*iter)[3]);
+        Point2f vertices[4];
+        rRect.points(vertices);
+        for (int i = 0; i < 4; i++)
+            line(image, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 6);
+    }
 
     // Draw Guil.
-    // for (vector<Vec4f>::iterator iter = positionGuil.begin(); iter != positionGuil.end(); ++iter) {
-    //     RotatedRect rRect = RotatedRect(Point2f((*iter)[0], (*iter)[1]), Size2f(w * (*iter)[2], h * (*iter)[2]), (*iter)[3]);
-    //     Point2f vertices[4];
-    //     rRect.points(vertices);
-    //     for (int i = 0; i < 4; i++)
-    //         line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
-    // }
+    for (vector<Vec4f>::iterator iter = positionGuil.begin(); iter != positionGuil.end(); ++iter) {
+        RotatedRect rRect = RotatedRect(Point2f((*iter)[0], (*iter)[1]), Size2f(w * (*iter)[2], h * (*iter)[2]), (*iter)[3]);
+        Point2f vertices[4];
+        rRect.points(vertices);
+        for (int i = 0; i < 4; i++)
+            line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
+    }
 
-    // imshow("result_img", image);
-    // waitKey();
+    imshow("result_img", image);
+    waitKey();
     return EXIT_SUCCESS;
 }
