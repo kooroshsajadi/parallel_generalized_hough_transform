@@ -2,6 +2,7 @@
 #include <vector>
 #include <utility> // For std::pair (point)
 #include <map> // For R-Table
+#include <cmath> // For std::sqrt
 
 // Structure to represent a point (x, y)
 typedef std::pair<int, int> Point;
@@ -22,6 +23,12 @@ int calculateGradientDirection(int x, int y) {
     // ... (implementation to calculate gradient direction) ...
     // For now, let's just return a dummy value
     return 0; 
+}
+
+// Function to calculate gradient magnitude (placeholder - you'll need to implement this)
+double calculateGradientMagnitude(int x, int y) {
+    // ... (implementation to calculate gradient magnitude)
+    return 0; // Dummy value for now
 }
 
 int main() {
@@ -60,7 +67,37 @@ int main() {
         accumulatorHeight,
         std::vector<std::vector<int>>(accumulatorWidth, std::vector<int>(numScales, 0)));
 
-    // ... (rest of the GHT implementation, including accumulation)
+    int edgeThreshold = 100;
+
+    // Accumulation process
+    for (int y = 0; y < image.size(); ++y) {
+        for (int x = 0; x < image[0].size(); ++x) {
+            double gradientMagnitude = calculateGradientMagnitude(x, y);
+            if (gradientMagnitude > edgeThreshold) { // Check against threshold
+                int gradientDirection = calculateGradientDirection(x, y);
+
+                double scales[] = {0.8, 1.0, 1.2}; // Example scales
+                for (double scale : scales) {
+                    for (int i = 0; i < model.size(); ++i) {
+                        auto key = std::make_tuple(gradientDirection, i, scale);
+                        if (rTable.count(key)) {
+                            Point rVector = rTable[key];
+                            // Calculate potential reference point location
+                            int refX = std::round(x - rVector.first);
+                            int refY = std::round(y - rVector.second);
+
+                            // Check if the reference point is within the accumulator array bounds
+                            if (refX >= 0 && refX < accumulatorWidth && refY >= 0 && refY < accumulatorHeight) {
+                                accumulator[refY][refX][0]++; // Increment the accumulator (for now, only one scale)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ... (rest of the GHT implementation: detection of maxima in accumulator array)
 
     return 0;
 }
