@@ -70,7 +70,10 @@ int main() {
     std::vector<std::vector<std::vector<int>>> accumulator(accumulatorHeight, std::vector<std::vector<int>>(accumulatorWidth, std::vector<int>(numScales, 0)));
     
     cv::Mat testEdges;
-    cv::Canny(testImage, testEdges, 100, 200);
+    cv::Canny(testImage, testEdges, 100, 200); // Apply Canny edge detection.
+
+    cv::imshow("Template Edges", testEdges);
+    cv::waitKey(0);
     
     for (int y = 0; y < testEdges.rows; ++y) {
         for (int x = 0; x < testEdges.cols; ++x) {
