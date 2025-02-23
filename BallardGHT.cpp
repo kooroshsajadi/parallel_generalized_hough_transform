@@ -144,18 +144,12 @@ int main() {
     Mat edgeTemplate = applyCannyEdgeDetection(templ, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
     Mat edgeImage = applyCannyEdgeDetection(image, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
 
-    // Print edge images
-    imshow("Edge Template", edgeTemplate);
-    waitKey(0);
-    imshow("Edge Image", edgeImage);
-    waitKey(0);
-
     // Define the reference point (center of the template)
     Point reference = {templ.cols / 2, templ.rows / 2};
 
     // Draw the reference point on the grayscale template
     Mat templWithReference = templ.clone();
-    circle(templWithReference, reference, 5, Scalar(255), -1); // Draw a filled circle at the reference point
+    circle(templWithReference, reference, 5, Scalar(0, 255, 0), -1); // Draw a filled circle at the reference point
 
     // Display the template with the reference point
     imshow("Template with Reference Point", templWithReference);
