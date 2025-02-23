@@ -123,6 +123,12 @@ int main() {
     Mat edgeTemplate = applyCannyEdgeDetection(templ, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
     Mat edgeImage = applyCannyEdgeDetection(image, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
 
+    // Print edge images
+    // imshow("Edge Template", edgeTemplate);
+    // waitKey(0);
+    // imshow("Edge Image", edgeImage);
+    // waitKey(0);
+
     // Define the reference point (center of the template)
     Point reference = {templ.cols / 2, templ.rows / 2};
 
