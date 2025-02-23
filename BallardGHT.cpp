@@ -147,14 +147,6 @@ int main() {
     // Define the reference point (center of the template)
     Point reference = {templ.cols / 2, templ.rows / 2};
 
-    // Draw the reference point on the grayscale template
-    Mat templWithReference = templ.clone();
-    circle(templWithReference, reference, 5, Scalar(0, 255, 0), -1); // Draw a filled circle at the reference point
-
-    // Display the template with the reference point
-    imshow("Template with Reference Point", templWithReference);
-    waitKey(0);
-
     // Construct the R-Table
     RTable rTable;
     constructRTable(edgeTemplate, rTable, reference);
