@@ -131,18 +131,19 @@ int main() {
     }
 
     // Load the input image
-    Mat coloredImage = imread("resources/image_key.png");
+    Mat coloredImage = imread("resources/image_key.png", IMREAD_GRAYSCALE);
     if (coloredImage.empty()) {
         cerr << "Error: Could not load input image." << endl;
         return EXIT_FAILURE;
     }
+
     // Create grayscale image.
-    Mat image;
-    cvtColor(coloredImage, image, COLOR_RGB2GRAY); // Grayscaling makes edge detection more effective.
+    // Mat image;
+    // cvtColor(coloredImage, image, COLOR_RGB2GRAY); // Grayscaling makes edge detection more effective.
 
     // Apply Canny edge detection to the template and input image
     Mat edgeTemplate = applyCannyEdgeDetection(templ, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
-    Mat edgeImage = applyCannyEdgeDetection(image, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
+    Mat edgeImage = applyCannyEdgeDetection(coloredImage, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
 
     // Define the reference point (center of the template)
     Point reference = {templ.cols / 2, templ.rows / 2};
