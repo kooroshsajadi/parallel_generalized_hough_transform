@@ -35,6 +35,17 @@ int main() {
         std::cerr << "Error: Could not load images." << std::endl;
         return -1;
     }
+
+    // Print the shape of the template image
+    std::cout << "Shape of the template image: (" << templateImage.rows << ", " << templateImage.cols << ")" << std::endl;
+    // Print the pixel matrix of the template image
+    std::cout << "Pixel matrix of the template image:" << std::endl;
+    for (int i = 0; i < templateImage.rows; ++i) {
+        for (int j = 0; j < templateImage.cols; ++j) {
+            std::cout << static_cast<int>(templateImage.at<uchar>(i, j)) << " ";
+        }
+        std::cout << std::endl;
+    }
     
     Model model;
     std::vector<double> scales = {0.8, 1.0, 1.2};
@@ -42,7 +53,7 @@ int main() {
 
     for (int y = 0; y < templateImage.rows; ++y) {
         for (int x = 0; x < templateImage.cols; ++x) {
-            if (templateImage.at<uchar>(y, x) > 200) {
+            if (templateImage.at<uchar>(y, x) > 30 && templateImage.at<uchar>(y, x) < 110) {
                 model.push_back({x, y});
             }
         }
@@ -53,6 +64,9 @@ int main() {
     for (const auto& pt : model) {
         cv::circle(templateDisplay, cv::Point(pt.first, pt.second), 2, cv::Scalar(0, 0, 255), -1);
     }
+
+    // cv::imshow("Template with Keypoints", templateDisplay);
+    // cv::waitKey(0);
     
     RTable rTable;
     for (double scale: scales) {
@@ -72,8 +86,8 @@ int main() {
     cv::Mat testEdges;
     cv::Canny(testImage, testEdges, 100, 200); // Apply Canny edge detection.
 
-    cv::imshow("Template Edges", testEdges);
-    cv::waitKey(0);
+    // cv::imshow("Template Edges", testEdges);
+    // cv::waitKey(0);
     
     for (int y = 0; y < testEdges.rows; ++y) {
         for (int x = 0; x < testEdges.cols; ++x) {
@@ -115,7 +129,6 @@ int main() {
         cv::circle(testDisplay, cv::Point(detection.x, detection.y), 10, cv::Scalar(255, 0, 0), 2);
     }
     
-    cv::imshow("Template with Keypoints", templateDisplay);
     cv::imshow("Detected Objects", testDisplay);
     cv::waitKey(0);
     return 0;

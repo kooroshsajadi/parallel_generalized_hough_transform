@@ -72,6 +72,7 @@
         "format": "cpp",
         "__nullptr": "cpp",
         "__split_buffer": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "cinttypes": "cpp"
     }
 }

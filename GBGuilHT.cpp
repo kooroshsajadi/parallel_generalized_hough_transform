@@ -16,7 +16,7 @@ int main() {
     cvtColor(image, grayImage, COLOR_RGB2GRAY); // Grayscaling makes edge detection more effective.
 
     // Create variable for location, scale and rotation of detected templates.
-    vector<Vec4f> positionBallard, positionGuil;
+    vector<Vec4f> positionBallard;
 
     // Set template's width and height.
     int w = templ.cols;
@@ -33,34 +33,10 @@ int main() {
     ballard->setCannyHighThresh(110); // The second threshold for the hysteresis procedure in Canny edge detector
     ballard->setTemplate(templ);
 
-    // Create guil and set options.
-    Ptr<GeneralizedHoughGuil> guil = createGeneralizedHoughGuil();
-    guil->setMinDist(10); // Minimum distance between detected objects in pixels
-    guil->setLevels(360); // Set the number of rotation levels; 360 is maximal value.
-    guil->setDp(3); // Resolution of the accumulator used to detect centers of the objects
-    guil->setMaxBufferSize(1000); // Maximal size of inner buffers
-    guil->setMinAngle(0); // Minimal angle for the template in degrees
-    guil->setMaxAngle(360); // Maximal angle for the template in degrees
-    guil->setAngleStep(1); // Angle step in degrees
-    guil->setAngleThresh(1500); // Angle threshold in degrees
-    guil->setMinScale(0.5); // Minimal scale of the template
-    guil->setMaxScale(2.0); // Maximal scale of the template
-    guil->setScaleStep(0.05); // Scale step
-    guil->setScaleThresh(50); // Scale threshold
-    guil->setPosThresh(10); // Position threshold
-    guil->setCannyLowThresh(30); // The first threshold for the hysteresis procedure in Canny edge detector
-    guil->setCannyHighThresh(110); // The second threshold for the hysteresis procedure in Canny edge detector
-    guil->setTemplate(templ);
-
     // Execute Ballard detection.
     cout << "Executing Ballard detection..." << endl;
     ballard->detect(grayImage, positionBallard);
     cout << "Ballard detection completed. Found " << positionBallard.size() << " objects." << endl;
-
-    // Execute Guil detection.
-    cout << "Executing Guil detection..." << endl;
-    guil->detect(grayImage, positionGuil);
-    cout << "Guil detection completed. Found " << positionGuil.size() << " objects." << endl;
 
     //  draw Ballard.
     for (vector<Vec4f>::iterator iter = positionBallard.begin(); iter != positionBallard.end(); ++iter) {
@@ -69,15 +45,6 @@ int main() {
         rRect.points(vertices);
         for (int i = 0; i < 4; i++)
             line(image, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 6);
-    }
-
-    // Draw Guil.
-    for (vector<Vec4f>::iterator iter = positionGuil.begin(); iter != positionGuil.end(); ++iter) {
-        RotatedRect rRect = RotatedRect(Point2f((*iter)[0], (*iter)[1]), Size2f(w * (*iter)[2], h * (*iter)[2]), (*iter)[3]);
-        Point2f vertices[4];
-        rRect.points(vertices);
-        for (int i = 0; i < 4; i++)
-            line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
     }
 
     imshow("result_img", image);
