@@ -151,15 +151,6 @@ int main() {
     RTable rTable;
     constructRTable(edgeTemplate, rTable, reference);
 
-    // Print the R-Table for debugging
-    for (const auto &entry : rTable) {
-        cout << "Angle: " << entry.first << " -> Vectors: ";
-        for (const auto &vec : entry.second) {
-            cout << "(" << vec.x << ", " << vec.y << ") ";
-        }
-        cout << endl;
-    }
-
     // Detect objects in the input image using the R-Table
     vector<Point> detections = detectObjects(edgeImage, rTable, VOTE_THRESHOLD, ACCUMULATOR_DEPTH, MIN_DISTANCE);
 
