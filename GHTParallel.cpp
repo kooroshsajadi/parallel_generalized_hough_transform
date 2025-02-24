@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
 
     // Start timing the core GHT process (all processes participate)
-    // auto start = chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now();
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -224,14 +224,14 @@ int main(int argc, char** argv) {
         waitKey(0);
     }
 
-    // End timing (before visualization, after parallel computation)
-    // auto end = chrono::high_resolution_clock::now();
-    // chrono::duration<double> duration = end - start;
+    // End timing.
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
 
     // Only rank 0 prints the execution time
-    // if (rank == 0) {
-    //     cout << "Parallel GHT core process execution time: " << duration.count() << " seconds" << endl;
-    // }
+    if (rank == 0) {
+        cout << "Parallel GHT core process execution time: " << duration.count() << " seconds" << endl;
+    }
 
     MPI_Finalize();
     return EXIT_SUCCESS;
