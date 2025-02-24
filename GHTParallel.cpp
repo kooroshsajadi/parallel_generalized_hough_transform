@@ -2,8 +2,9 @@
 #include <vector>
 #include <map>
 #include <cmath>
-#include <opencv2/opencv.hpp>
 #include <mpi.h>
+#include <opencv2/opencv.hpp>
+
 
 using namespace cv;
 using namespace std;
@@ -137,7 +138,6 @@ vector<Point> detectObjects(const Mat &edgeImage, const RTable &rTable, int vote
 }
 
 int main(int argc, char** argv) {
-    // Initialize MPI
     MPI_Init(&argc, &argv);
 
     int rank, size;
