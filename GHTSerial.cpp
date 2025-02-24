@@ -20,7 +20,6 @@ const int MIN_DISTANCE = 80;           // Minimum distance between detected obje
 
 typedef map<int, vector<Point>> RTable; // R-Table: maps quantized angles to displacement vectors
 
-// Function to calculate gradient direction
 int calculateGradientDirection(const Mat &image, int x, int y) {
     Mat grad_x, grad_y;
     Sobel(image, grad_x, CV_32F, 1, 0, 3);
@@ -31,14 +30,12 @@ int calculateGradientDirection(const Mat &image, int x, int y) {
     return static_cast<int>(atan2(dy, dx) * 180 / CV_PI) % ROTATION_LEVELS; // Quantize to 0-359 degrees
 }
 
-// Function to apply Canny edge detection
 Mat applyCannyEdgeDetection(const Mat &image, int lowThreshold, int highThreshold) {
     Mat edges;
     Canny(image, edges, lowThreshold, highThreshold);
     return edges;
 }
 
-// Function to construct the R-Table
 void constructRTable(const Mat &templ, RTable &rTable, Point reference) {
     for (int y = 0; y < templ.rows; y++) {
         for (int x = 0; x < templ.cols; x++) {
@@ -60,7 +57,7 @@ void constructRTable(const Mat &templ, RTable &rTable, Point reference) {
     }
 }
 
-// Function to detect objects using the R-Table
+// Function to detect objects using the R-Table.
 vector<Point> detectObjects(const Mat &edgeImage, const RTable &rTable, int voteThreshold, int dp, int minDistance) {
     int width = edgeImage.cols / dp; // Scale accumulator width
     int height = edgeImage.rows / dp; // Scale accumulator height

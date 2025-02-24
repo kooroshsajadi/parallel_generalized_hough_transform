@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Broadcast the input image to all processes
+    // Broadcast the input image to all processes.
     int imageRows, imageCols;
     if (rank == 0) {
         imageRows = coloredImage.rows;
@@ -192,24 +192,24 @@ int main(int argc, char** argv) {
     }
     MPI_Bcast(coloredImage.data, imageRows * imageCols * 3, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 
-    // Create grayscale image
+    // Create grayscale image.
     Mat image;
     cvtColor(coloredImage, image, COLOR_RGB2GRAY);
 
-    // Apply Canny edge detection to the template and input image
+    // Apply Canny edge detection to the template and input image.
     Mat edgeTemplate = applyCannyEdgeDetection(templ, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
     Mat edgeImage = applyCannyEdgeDetection(image, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
 
-    // Define the reference point (center of the template)
+    // Define the reference point (center of the template).
     Point reference = {templ.cols / 2, templ.rows / 2};
 
-    // Construct the R-Table (only rank 0)
+    // Construct the R-Table (only rank 0).
     RTable rTable;
     if (rank == 0) {
         constructRTable(edgeTemplate, rTable, reference);
     }
 
-    // Broadcast the R-Table to all processes
+    // Broadcast the R-Table to all processes.
     int rTableSize;
     if (rank == 0) {
         rTableSize = rTable.size();
@@ -238,27 +238,26 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Detect objects in the input image using the R-Table
+    // Detect objects in the input image using the R-Table.
     vector<Point> detections = detectObjects(edgeImage, rTable, VOTE_THRESHOLD, ACCUMULATOR_DEPTH, MIN_DISTANCE, rank, size);
 
-    // Only rank 0 draws the detected objects and displays the result
+    // Only rank 0 draws the detected objects and displays the result.
     if (rank == 0) {
-        // Draw the detected objects on the input image
+        // Draw the detected objects on the input image.
         for (const auto &center : detections) {
-            // Draw a circle at the detected center
+            // Draw a circle at the detected center.
             circle(coloredImage, center, 10, Scalar(255, 0, 0), 2);
 
-            // Draw a bounding box around the detected object
+            // Draw a bounding box around the detected object.
             Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
             rectangle(coloredImage, boundingBox, Scalar(0, 255, 0), 2);
         }
 
-        // Display the result
         imshow("Detected Objects", coloredImage);
         waitKey(0);
     }
 
-    // Finalize MPI
+    // Finalize MPI.
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
