@@ -220,9 +220,9 @@ int main(int argc, char** argv) {
             rectangle(coloredImage, boundingBox, Scalar(0, 255, 0), 2);
         }
 
-        imshow("Detected Objects", coloredImage);
-        waitKey(0);
-    }
+    //     imshow("Detected Objects", coloredImage);
+    //     waitKey(0);
+    // }
 
     // End timing.
     auto end = chrono::high_resolution_clock::now();
