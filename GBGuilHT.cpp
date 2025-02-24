@@ -24,7 +24,7 @@ int main() {
 
     // Create ballard and set options.
     Ptr<GeneralizedHoughBallard> ballard = createGeneralizedHoughBallard();
-    ballard->setMinDist(10); // Minimum distance between detected objects in pixels
+    ballard->setMinDist(50); // Minimum distance between detected objects in pixels
     ballard->setLevels(360); // Set the number of rotation levels; 360 is maximal value.
     ballard->setDp(2); // Resolution of the accumulator used to detect centers of the objects
     ballard->setMaxBufferSize(1000); // Maximal size of inner buffers
