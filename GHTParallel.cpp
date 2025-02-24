@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     // Print the rank of the current process
-    cout << "Process rank: " << rank << " out of " << size << " total processes" << endl;
+    // cout << "Process rank: " << rank << " out of " << size << " total processes" << endl;
 
     Mat templ;
     if (rank == 0) {
