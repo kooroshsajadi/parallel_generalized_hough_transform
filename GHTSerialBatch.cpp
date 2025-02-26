@@ -165,7 +165,7 @@ int main() {
     // Print execution time for the batch
     cout << "Execution time for batch processing " << imageFiles.size() << " images: " << duration.count() << " seconds" << endl;
 
-    // Draw detections on all images and optionally display/save
+    // Draw detections on all images and save.
     for (size_t i = 0; i < imageFiles.size(); i++) {
         if (!coloredImages[i].empty()) {
             for (const auto center : allDetections[i]) { // Fixed typo: '¢er' to 'center'
