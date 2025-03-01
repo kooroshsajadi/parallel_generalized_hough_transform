@@ -179,8 +179,8 @@ int main() {
             // waitKey(0);
 
             // Optionally save the output
-            string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
-            imwrite(outputFile, coloredImages[i]);
+            // string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
+            // imwrite(outputFile, coloredImages[i]);
         }
     }
 
