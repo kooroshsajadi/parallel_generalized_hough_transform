@@ -174,7 +174,6 @@ int main() {
                 rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
             }
 
-            // Uncomment to display each image
             // imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
             // waitKey(0);
 

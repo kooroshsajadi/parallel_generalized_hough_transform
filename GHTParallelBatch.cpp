@@ -308,8 +308,12 @@ int main(int argc, char** argv) {
                     Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
                     rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
                 }
-                string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
-                imwrite(outputFile, coloredImages[i]);
+
+                // imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
+                // waitKey(0);
+                
+                // string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
+                // imwrite(outputFile, coloredImages[i]);
             }
         }
     }
