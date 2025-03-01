@@ -165,23 +165,22 @@ int main() {
     // Print execution time for the batch
     cout << "Execution time for batch processing " << imageFiles.size() << " images: " << duration.count() << " seconds" << endl;
 
-    // Draw detections on all images and save.
-    for (size_t i = 0; i < imageFiles.size(); i++) {
-        if (!coloredImages[i].empty()) {
-            for (const auto center : allDetections[i]) { // Fixed typo: '¢er' to 'center'
-                circle(coloredImages[i], center, 10, Scalar(255, 0, 0), 2);
-                Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
-                rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
-            }
+    // Draw detections on all images and save. (comment out if needed)
+    // for (size_t i = 0; i < imageFiles.size(); i++) {
+    //     if (!coloredImages[i].empty()) {
+    //         for (const auto center : allDetections[i]) { // Fixed typo: '¢er' to 'center'
+    //             circle(coloredImages[i], center, 10, Scalar(255, 0, 0), 2);
+    //             Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
+    //             rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
+    //         }
 
-            // imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
-            // waitKey(0);
+    //         imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
+    //         waitKey(0);
 
-            // Optionally save the output
-            // string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
-            // imwrite(outputFile, coloredImages[i]);
-        }
-    }
+    //         string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
+    //         imwrite(outputFile, coloredImages[i]);
+    //     }
+    // }
 
     return EXIT_SUCCESS;
 }

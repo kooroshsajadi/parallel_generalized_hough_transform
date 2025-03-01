@@ -298,24 +298,24 @@ int main(int argc, char** argv) {
     if (rank == 0) {
         cout << "Parallel GHT batch processing time for " << numImages << " images: " << duration.count() << " seconds" << endl;
 
-        // Load images again for drawing (simplification; could optimize by storing)
-        vector<Mat> coloredImages(numImages);
-        for (int i = 0; i < numImages; i++) {
-            coloredImages[i] = imread(imageFiles[i]);
-            if (!coloredImages[i].empty()) {
-                for (const auto center : allDetections[i]) {
-                    circle(coloredImages[i], center, 10, Scalar(255, 0, 0), 2);
-                    Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
-                    rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
-                }
+        // Load images again for drawing (comment out if needed)
+        // vector<Mat> coloredImages(numImages);
+        // for (int i = 0; i < numImages; i++) {
+        //     coloredImages[i] = imread(imageFiles[i]);
+        //     if (!coloredImages[i].empty()) {
+        //         for (const auto center : allDetections[i]) {
+        //             circle(coloredImages[i], center, 10, Scalar(255, 0, 0), 2);
+        //             Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
+        //             rectangle(coloredImages[i], boundingBox, Scalar(0, 255, 0), 2);
+        //         }
 
-                // imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
-                // waitKey(0);
-                
-                // string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
-                // imwrite(outputFile, coloredImages[i]);
-            }
-        }
+        //         imshow("Detected Objects - " + imageFiles[i], coloredImages[i]);
+        //         waitKey(0);
+
+        //         string outputFile = "resources/dataset/output_" + to_string(i) + ".png";
+        //         imwrite(outputFile, coloredImages[i]);
+        //     }
+        // }
     }
 
     MPI_Finalize();
