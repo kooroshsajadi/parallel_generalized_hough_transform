@@ -187,12 +187,12 @@ int main(int argc, char** argv) {
     // Load all image filenames on rank 0 and broadcast
     vector<String> imageFiles;
     if (rank == 0) {
-        glob("~/resources/dataset/*.png", imageFiles, false);
+        glob("resources/dataset/*.png", imageFiles, false);
         if (imageFiles.empty()) {
             cerr << "Error: No PNG images found in resources/dataset directory." << endl;
             MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
         }
-        cout << "Processing " << imageFiles.size() << " images from ~/resources/dataset/" << endl;
+        cout << "Processing " << imageFiles.size() << " images from resources/dataset/" << endl;
     }
 
     int numImages = (rank == 0) ? static_cast<int>(imageFiles.size()) : 0;

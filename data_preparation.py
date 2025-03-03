@@ -4,7 +4,7 @@
 import os
 import shutil
 
-def create_image_copies(image_path, output_dir, num_copies=1024):
+def create_image_copies(image_path, output_dir, num_copies=64):
     """Creates multiple copies of an image with sequential filenames."""
     
     # Ensure output directory exists.
