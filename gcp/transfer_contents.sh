@@ -1,4 +1,5 @@
 #!/bin/bash
+# This bash can be executed in the master node for sending contents to slave nodes.
 for vm in 10.128.0.{6..12}; do
   scp GHTParallelBatch $vm:~/
   scp -r ~/resources $vm:~/

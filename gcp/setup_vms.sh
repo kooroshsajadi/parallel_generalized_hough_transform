@@ -1,4 +1,5 @@
 #!/bin/bash
+# This bash can be executed from the master node to set up requirements in the slave nodes.
 VMS=("10.128.0.6" "10.128.0.7" "10.128.0.8" "10.128.0.9" "10.128.0.10" "10.128.0.11" "10.128.0.12")
 for vm in "${VMS[@]}"; do
   echo "Setting up $vm"
