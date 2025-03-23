@@ -1,6 +1,5 @@
 # Generalized Hough Transform Performance Comparison in Serial and Parallel
 In this project, we are comparing the performance of the Generalized Hough Transform (GHT) algorithm in serial and parallel (using MPI).
-The original code from the author is presereved so for further work on the project, the Cuda implementation will also be applied.
 
 This repository is under development.
 
