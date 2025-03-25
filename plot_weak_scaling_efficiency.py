@@ -27,7 +27,7 @@ def plot_line_chart(x_values, y_values):
 
 # Data from your weak scaling results
 x_points = [1, 2, 4, 8, 16]  # Number of processes
-y_points = [1.0, 1.39, 1.48, 1.68, 1.70]  # Efficiency values
+y_points = [1.0, 0.85, 0.81, 0.83, 0.84]  # Efficiency values
 
 # Generate the plot
 plot_line_chart(x_points, y_points)
