@@ -114,20 +114,21 @@ vector<Point> detectObjects(const Mat &edgeImage, const RTable &rTable, int vote
 }
 
 int main(int argc, char** argv) {
+    // Initialize the MPI environment
     MPI_Init(&argc, &argv);
 
-    // Start timing the core GHT process (all processes participate)
+    // Start timing the execution (all processes start the timer)
     auto start = chrono::high_resolution_clock::now();
 
     int rank, size;
+    // Get the rank (ID) of the current process
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    // Get the total number of processes
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    // Print the rank of the current process
-    // cout << "Process rank: " << rank << " out of " << size << " total processes" << endl;
 
     Mat templ;
     if (rank == 0) {
+        // Master process loads the template image in grayscale
         templ = imread("resources/template_key.png", IMREAD_GRAYSCALE);
         if (templ.empty()) {
             cerr << "Error: Could not load template image." << endl;
@@ -135,6 +136,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Broadcast the dimensions of the template image to all processes
     int templRows, templCols;
     if (rank == 0) {
         templRows = templ.rows;
@@ -143,13 +145,16 @@ int main(int argc, char** argv) {
     MPI_Bcast(&templRows, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&templCols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    // Non-master processes allocate memory for the template image
     if (rank != 0) {
         templ = Mat(templRows, templCols, CV_8UC1);
     }
+    // Broadcast the actual pixel data of the template image
     MPI_Bcast(templ.data, templRows * templCols, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 
     Mat coloredImage;
     if (rank == 0) {
+        // Master process loads the full-color input image
         coloredImage = imread("resources/image_key.png");
         if (coloredImage.empty()) {
             cerr << "Error: Could not load input image." << endl;
@@ -157,6 +162,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Broadcast the dimensions of the input image to all processes
     int imageRows, imageCols;
     if (rank == 0) {
         imageRows = coloredImage.rows;
@@ -165,30 +171,46 @@ int main(int argc, char** argv) {
     MPI_Bcast(&imageRows, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&imageCols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    // Non-master processes allocate memory for the colored input image
     if (rank != 0) {
         coloredImage = Mat(imageRows, imageCols, CV_8UC3);
     }
+    // Broadcast the actual pixel data of the input image
     MPI_Bcast(coloredImage.data, imageRows * imageCols * 3, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 
+    // Convert colored image to grayscale for edge detection
     Mat image;
     cvtColor(coloredImage, image, COLOR_RGB2GRAY);
 
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Edge Detection Phase ░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+    // Apply Canny edge detection to both the template and the input image
     Mat edgeTemplate = applyCannyEdgeDetection(templ, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
     Mat edgeImage = applyCannyEdgeDetection(image, CANNY_LOW_THRESHOLD, CANNY_HIGH_THRESHOLD);
 
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ R-Table Construction ░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+    // Define the reference point (center of the template)
     Point reference = {templ.cols / 2, templ.rows / 2};
 
+    // Construct the R-Table on the master process
     RTable rTable;
     if (rank == 0) {
         constructRTable(edgeTemplate, rTable, reference);
     }
 
+    // Broadcast the size of the R-Table
     int rTableSize;
     if (rank == 0) {
         rTableSize = rTable.size();
     }
     MPI_Bcast(&rTableSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    // Broadcast each entry (angle and vector list) of the R-Table
     for (int i = 0; i < rTableSize; i++) {
         int angle, vectorCount;
         if (rank == 0) {
@@ -204,35 +226,48 @@ int main(int argc, char** argv) {
         if (rank == 0) {
             vectors = rTable[angle];
         }
+        // Broadcast the list of vectors for this angle
         MPI_Bcast(vectors.data(), vectorCount * 2, MPI_INT, 0, MPI_COMM_WORLD);
 
+        // Non-master processes populate their local R-Table
         if (rank != 0) {
             rTable[angle] = vectors;
         }
     }
 
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Parallel Detection Phase ░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+    // Perform parallel Generalized Hough Transform detection
     vector<Point> detections = detectObjects(edgeImage, rTable, VOTE_THRESHOLD, ACCUMULATOR_DEPTH, MIN_DISTANCE, rank, size);
 
+    // Master process draws the results on the image
     if (rank == 0) {
-        for (const auto center : detections) { // Fixed typo: '¢er' to 'center'
+        for (const auto center : detections) {
+            // Draw a circle at the detected center
             circle(coloredImage, center, 10, Scalar(255, 0, 0), 2);
+
+            // Draw a bounding box around the detected object
             Rect boundingBox(center.x - templ.cols / 2, center.y - templ.rows / 2, templ.cols, templ.rows);
             rectangle(coloredImage, boundingBox, Scalar(0, 255, 0), 2);
         }
 
+        // Optional: display the result (commented out)
         // imshow("Detected Objects", coloredImage);
         // waitKey(0);
     }
 
-    // End timing.
+    // Stop timing and calculate duration
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> duration = end - start;
 
-    // Only rank 0 prints the execution time
+    // Only the master process prints the elapsed time
     if (rank == 0) {
         cout << "Parallel GHT core process execution time: " << duration.count() << " seconds" << endl;
     }
 
+    // Finalize the MPI environment
     MPI_Finalize();
     return EXIT_SUCCESS;
 }

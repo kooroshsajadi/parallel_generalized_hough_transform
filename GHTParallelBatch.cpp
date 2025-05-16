@@ -135,6 +135,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Broadcast template dimensions to all workers
     int templRows, templCols;
     if (rank == 0) {
         templRows = templ.rows;
@@ -156,6 +157,7 @@ int main(int argc, char** argv) {
         constructRTable(edgeTemplate, rTable, reference);
     }
 
+    // Broadcast R-Table structure.
     int rTableSize;
     if (rank == 0) {
         rTableSize = rTable.size();
@@ -184,6 +186,9 @@ int main(int argc, char** argv) {
         }
     }
 
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Parallel Batch Distribution System ░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
     // Load all image filenames on rank 0 and broadcast
     vector<String> imageFiles;
     if (rank == 0) {
@@ -196,9 +201,10 @@ int main(int argc, char** argv) {
     }
 
     int numImages = (rank == 0) ? static_cast<int>(imageFiles.size()) : 0;
-    MPI_Bcast(&numImages, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&numImages, 1, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast total image count
 
-    // Distribute images across processes
+    // Calculate workload distribution.
+    // Distribute images across processes.
     int imagesPerProcess = numImages / size;
     int startIdx = rank * imagesPerProcess;
     int endIdx = (rank == size - 1) ? numImages : startIdx + imagesPerProcess;
@@ -206,8 +212,10 @@ int main(int argc, char** argv) {
     vector<Mat> localImages(endIdx - startIdx);
     vector<vector<Point>> localDetections(endIdx - startIdx);
 
-    // Rank 0 loads all images and sends to respective processes
-    if (rank == 0) {
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Image Distribution Mechanism ░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    if (rank == 0) { // Mater distributes images.
         vector<Mat> allImages(numImages);
         for (int i = 0; i < numImages; i++) {
             allImages[i] = imread(imageFiles[i]);
@@ -217,7 +225,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        // Send images to other processes.
+        // Distribute images using master-slave pattern.
         for (int r = 0; r < size; r++) {
             int rStart = r * imagesPerProcess;
             int rEnd = (r == size - 1) ? numImages : rStart + imagesPerProcess;
@@ -225,9 +233,9 @@ int main(int argc, char** argv) {
                 int rows = allImages[i].rows;
                 int cols = allImages[i].cols;
                 int type = allImages[i].type();
-                if (r == 0) {
+                if (r == 0) { // Master keeps its portion
                     localImages[i - rStart] = allImages[i];
-                } else {
+                } else { // Send to worker processes
                     MPI_Send(&rows, 1, MPI_INT, r, i, MPI_COMM_WORLD);
                     MPI_Send(&cols, 1, MPI_INT, r, i, MPI_COMM_WORLD);
                     MPI_Send(&type, 1, MPI_INT, r, i, MPI_COMM_WORLD);
@@ -237,8 +245,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-    } else {
-        // Receive images assigned to this process.
+    } else { // Worker processes receive their images
         for (int i = startIdx; i < endIdx; i++) {
             int rows, cols, type;
             MPI_Recv(&rows, 1, MPI_INT, 0, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -251,7 +258,9 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Process local batch of images.
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Parallel Processing Phase ░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
     for (int i = 0; i < localImages.size(); i++) {
         if (!localImages[i].empty()) {
             cout << "Process rank: " << rank << " Processing local image #" << i << " ..." << endl;
@@ -262,12 +271,16 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Gather detections to rank 0 (simplified: assuming small number of detections)
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░ Results Aggregation Phase ░░░░░░░░░░░░░░
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
     vector<vector<Point>> allDetections(numImages);
-    if (rank == 0) {
+    if (rank == 0) { // Master collects results.
+        // Store master's local result.
         for (int i = 0; i < localDetections.size(); i++) {
             allDetections[i] = localDetections[i];
         }
+        // Receive results from workers.
         for (int r = 1; r < size; r++) {
             int rStart = r * imagesPerProcess;
             int rEnd = (r == size - 1) ? numImages : rStart + imagesPerProcess;
@@ -280,7 +293,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-    } else {
+    } else { // Workers send their results.
         for (int i = 0; i < localDetections.size(); i++) {
             int detectionSize = localDetections[i].size();
             MPI_Send(&detectionSize, 1, MPI_INT, 0, startIdx + i, MPI_COMM_WORLD);
